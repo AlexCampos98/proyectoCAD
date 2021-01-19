@@ -6,14 +6,14 @@
 package proyectoignaciocad;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -23,11 +23,20 @@ public class ProyectoIgnacioCAD
 {
 
     //----------Usuario-----------//
+    /**
+     * Inserta un registro de usuario a la base de datos, tabla usuario.
+     * Devuelve el numero de registros insertados.
+     *
+     * @param usuario Clase solicitada con los datos necesarios del usuario para
+     * inserta en la BD.
+     * @return Cantidad de registros añadidos
+     * @throws excepcionProyecto Cuando se produzca cualquier error con la
+     * conexion o con excepciones SQL.
+     */
     public int insertarUsuario(usuario usuario) throws excepcionProyecto
     {
         String dml = "INSERT INTO usuario (id_usuario, correo, nombre, apellido1, apellido2, telefono, telefonoEmergencia, nombreUsuario) "
-                + "VALUES (sequence_usuario.NEXTVAL," + usuario.correo + "," + usuario.nombre + "," + usuario.apellido1 + "," + usuario.apellido2 + ","
-                + usuario.telefono + "," + usuario.telefonoEmergencia + "," + usuario.nombreUsuario + ")";
+                + "VALUES (sequence_usuario.NEXTVAL,?,?,?,?,?,?,?)";
         int resultado = 0;
 
         try
@@ -37,13 +46,20 @@ public class ProyectoIgnacioCAD
             //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
             Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
 
-            Statement sentencia = conexion.createStatement();
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setString(1, usuario.getCorreo());
+            sentenciaPreparada.setString(2, usuario.getNombre());
+            sentenciaPreparada.setString(3, usuario.getApellido1());
+            sentenciaPreparada.setString(4, usuario.getApellido2());
+            sentenciaPreparada.setString(5, usuario.getTelefono());
+            sentenciaPreparada.setString(6, usuario.getTelefonoEmergencia());
+            sentenciaPreparada.setString(7, usuario.getNombreUsuario());
 
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate(dml);
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaPreparada.close();
             conexion.close();
 
         } catch (ClassNotFoundException ex)
@@ -63,6 +79,10 @@ public class ProyectoIgnacioCAD
             {
                 case 1:
                     e.setMensajeErrorUsuario("El correo, el nombre de usuario o el telefono no pueden ser iguales que los de otros usuarios.");
+                    break;
+
+                case 1400:
+                    e.setMensajeErrorUsuario("No puede haber ningun campo vacio.");
                     break;
 
                 case 2290: //Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
@@ -88,6 +108,16 @@ public class ProyectoIgnacioCAD
         return resultado;
     }
 
+    /**
+     * Elimina el registro de la tabla usuario. Necesita el identificador del
+     * registro.
+     *
+     * @param idUsuario indica el valor del campo usuario.id_usuario del
+     * registro a eliminar
+     * @return Cantidad de registros eliminados
+     * @throws excepcionProyecto Cuando se produzca cualquier excepcion en la
+     * conexion a la BD
+     */
     public int eliminarUsuario(Integer idUsuario) throws excepcionProyecto
     {
         String dml = "DELETE FROM usuario WHERE id_usuario = " + idUsuario;
@@ -319,8 +349,8 @@ public class ProyectoIgnacioCAD
     public int insertarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
         String dml = "INSERT INTO entrenamiento (ID_ENTRENAMIENTO, NOMBRE, FECHA, PLAZAS, ID_USUARIO_ENTRENADOR, ID_USUARIO_DEPORTISTA) "
-                + "VALUES (sequence_entrenamiento.NEXTVAL," + entrenamiento.nombre + "," + entrenamiento.fecha + "," + entrenamiento.plazas + ","
-                + entrenamiento.idUsuarioEntrenador + "," + entrenamiento.idUsuarioDeportista + ")";
+                + "VALUES (sequence_entrenamiento.NEXTVAL,'" + entrenamiento.getNombre() + "','" + entrenamiento.getFecha() + "'," + entrenamiento.getPlazas() + ","
+                + entrenamiento.getIdUsuarioEntrenador().getIdUsuario() + "," + entrenamiento.getIdUsuarioDeportista().getIdUsuario() + ")";
         int resultado = 0;
 
         try
@@ -330,13 +360,20 @@ public class ProyectoIgnacioCAD
             //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
             Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
 
-            Statement sentencia = conexion.createStatement();
+            Statement sentenciaPreparada = conexion.createStatement();
+            
+//            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+//            sentenciaPreparada.setString(1, entrenamiento.getNombre());
+//            sentenciaPreparada.setObject(2, entrenamiento.getFecha(), Types.DATE);
+//            sentenciaPreparada.setObject(3, entrenamiento.getPlazas(), Types.INTEGER);
+//            sentenciaPreparada.setObject(4, entrenamiento.getIdUsuarioEntrenador());
+//            sentenciaPreparada.setObject(5, entrenamiento.getIdUsuarioDeportista());
 
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate(dml);
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaPreparada.close();
             conexion.close();
 
         } catch (ClassNotFoundException ex)
@@ -354,8 +391,12 @@ public class ProyectoIgnacioCAD
 
             switch (ex.getErrorCode())
             {
+                case 1400:
+                    e.setMensajeErrorUsuario("No puede haber ningun campo vacio.");
+                    break;
+
                 case 2291:
-                    e.setMensajeErrorUsuario("El identificador del entrenador o del deportista no existe.");
+                    e.setMensajeErrorUsuario("El entrenador o del deportista no existe.");
                     break;
 
                 case 2290:

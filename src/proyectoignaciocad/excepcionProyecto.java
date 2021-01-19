@@ -14,10 +14,20 @@ public class excepcionProyecto extends Exception
     String mensajeErrorUsuario, mensajeErrorAdministrador, sentenciaSQL;
     Integer codigoError;
 
+    /**
+     * Constructor vacio de la clase
+     */
     public excepcionProyecto()
     {
     }
 
+    /**
+     * Constructor completo de la clase
+     * @param mensajeErrorUsuario Mensaje a enviar al usuario
+     * @param mensajeErrorAdministrador Mensaje a enviar al administrador de la aplicacion
+     * @param sentenciaSQL Sentencia SQL que inicio el error
+     * @param codigoError  Codigo de error que devuelve la BD.
+     */
     public excepcionProyecto(String mensajeErrorUsuario, String mensajeErrorAdministrador, String sentenciaSQL, Integer codigoError)
     {
         this.mensajeErrorUsuario = mensajeErrorUsuario;
