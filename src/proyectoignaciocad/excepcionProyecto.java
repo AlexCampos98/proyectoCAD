@@ -9,16 +9,16 @@ package proyectoignaciocad;
  *
  * @author Alejandro Campos Maestre
  */
-public class excepcionUsuario extends Exception
+public class excepcionProyecto extends Exception
 {
     String mensajeErrorUsuario, mensajeErrorAdministrador, sentenciaSQL;
     Integer codigoError;
 
-    public excepcionUsuario()
+    public excepcionProyecto()
     {
     }
 
-    public excepcionUsuario(String mensajeErrorUsuario, String mensajeErrorAdministrador, String sentenciaSQL, Integer codigoError)
+    public excepcionProyecto(String mensajeErrorUsuario, String mensajeErrorAdministrador, String sentenciaSQL, Integer codigoError)
     {
         this.mensajeErrorUsuario = mensajeErrorUsuario;
         this.mensajeErrorAdministrador = mensajeErrorAdministrador;

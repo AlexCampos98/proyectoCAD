@@ -111,4 +111,10 @@ public class usuario
         this.nombreUsuario = nombreUsuario;
     }
 
+    @Override
+    public String toString()
+    {
+        return "usuario{" + "idUsuario=" + idUsuario + ", correo=" + correo + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", telefono=" + telefono + ", telefonoEmergencia=" + telefonoEmergencia + ", nombreUsuario=" + nombreUsuario + '}';
+    }
+
 }

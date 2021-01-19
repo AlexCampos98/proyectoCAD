@@ -5,10 +5,12 @@
  */
 package presentacion;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import proyectoignaciocad.ProyectoIgnacioCAD;
-import proyectoignaciocad.excepcionUsuario;
+import proyectoignaciocad.excepcionProyecto;
+import proyectoignaciocad.usuario;
 
 /**
  *
@@ -21,9 +23,10 @@ public class main
         ProyectoIgnacioCAD a = new ProyectoIgnacioCAD();
         try
         {
-            a.eliminarUsuario(10);
+            ArrayList<usuario> b = a.leerUsuarios();
+            System.out.println(b.toString());
             System.out.println("Se ha eliminado correctamente.");
-        } catch (excepcionUsuario ex)
+        } catch (excepcionProyecto ex)
         {
             System.out.println(ex.toString());
         }
