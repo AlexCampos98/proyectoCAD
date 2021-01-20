@@ -48,7 +48,7 @@ public class ProyectoIgnacioCAD
      *
      * @throws excepcionProyecto
      */
-    private void conexion() throws excepcionProyecto
+    private void conectar() throws excepcionProyecto
     {
         try
         {
@@ -77,7 +77,7 @@ public class ProyectoIgnacioCAD
      */
     public int insertarUsuario(usuario usuario) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "INSERT INTO usuario (id_usuario, correo, nombre, apellido1, apellido2, telefono, telefonoEmergencia, nombreUsuario) "
                 + "VALUES (sequence_usuario.NEXTVAL,?,?,?,?,?,?,?)";
         int resultado = 0;
@@ -147,7 +147,7 @@ public class ProyectoIgnacioCAD
      */
     public int eliminarUsuario(Integer idUsuario) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "DELETE FROM usuario WHERE id_usuario = ?";
         int resultado = 0;
         try
@@ -185,7 +185,7 @@ public class ProyectoIgnacioCAD
 
     public int modificarUsuario(usuario usuario) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "UPDATE usuario SET correo='" + usuario.correo + "', nombre='" + usuario.nombre + "', apellido1='" + usuario.apellido1 + "', "
                 + "apellido2='" + usuario.apellido2 + "', telefono='" + usuario.telefono + "', telefonoEmergencia='" + usuario.telefonoEmergencia + "', "
                 + "nombreUsuario='" + usuario.nombreUsuario + "' WHERE id_usuario = " + usuario.getIdUsuario();
@@ -235,7 +235,7 @@ public class ProyectoIgnacioCAD
 
     public usuario leerUsuario(Integer idUsuario) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dql = "SELECT * FROM usuario WHERE id_usuario = " + idUsuario;
         usuario usuario = new usuario();
         try
@@ -272,7 +272,7 @@ public class ProyectoIgnacioCAD
 
     public ArrayList<usuario> leerUsuarios() throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dql = "SELECT * FROM usuario";
         ArrayList<usuario> usuarios = new ArrayList<>();
         try
@@ -314,7 +314,7 @@ public class ProyectoIgnacioCAD
     //----------Entrenamiento-----------//
     public int insertarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "INSERT INTO entrenamiento (ID_ENTRENAMIENTO, NOMBRE, FECHA, PLAZAS, ID_USUARIO_ENTRENADOR, ID_USUARIO_DEPORTISTA) "
                 + "VALUES (sequence_entrenamiento.NEXTVAL,?,?,?,?,?)";
         int resultado = 0;
@@ -377,7 +377,7 @@ public class ProyectoIgnacioCAD
 
     public int eliminarEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "DELETE FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
         int resultado = 0;
         try
@@ -405,7 +405,7 @@ public class ProyectoIgnacioCAD
 
     public int modificarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dml = "UPDATE entrenamiento SET nombre='" + entrenamiento.nombre + "', fecha='" + entrenamiento.fecha + "', ID_USUARIO_DEPORTISTA='" + entrenamiento.idUsuarioDeportista + "', "
                 + "ID_USUARIO_ENTRENADOR='" + entrenamiento.idUsuarioEntrenador + "', plazas='" + entrenamiento.plazas + "' WHERE id_entrenamiento = " + entrenamiento.idEntrenamiento;
         int resultado = 0;
@@ -459,7 +459,7 @@ public class ProyectoIgnacioCAD
 
     public entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dql = "SELECT * FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
         entrenamiento entrenamiento = new entrenamiento();
         try
@@ -496,7 +496,7 @@ public class ProyectoIgnacioCAD
 
     public ArrayList<entrenamiento> leerEntrenamientos() throws excepcionProyecto
     {
-        conexion();
+        conectar();
         String dql = "SELECT * FROM entrenamiento";
         ArrayList<entrenamiento> entrenamientos = new ArrayList<>();
         try
