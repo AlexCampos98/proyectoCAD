@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +24,49 @@ import java.util.ArrayList;
 public class ProyectoIgnacioCAD
 {
 
-    
+    Connection conexion;
+
+    /**
+     * Carga el Driver en Memoria
+     *
+     * @throws proyectoignaciocad.excepcionProyecto Cuando se produzca cualquier
+     * error
+     */
+    public ProyectoIgnacioCAD() throws excepcionProyecto
+    {
+        try
+        {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        } catch (ClassNotFoundException ex)
+        {
+            excepcionProyecto e = new excepcionProyecto();
+            e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            throw e;
+        }
+    }
+
+    /**
+     * Metodo usado para conectar con la BD
+     *
+     * @throws excepcionProyecto
+     */
+    private void conexion() throws excepcionProyecto
+    {
+        try
+        {
+            //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
+            conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
+        } catch (SQLException ex)
+        {
+            excepcionProyecto e = new excepcionProyecto();
+            e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            throw e;
+        }
+    }
+
     //----------Usuario-----------//
     /**
      * Inserta un registro de usuario a la base de datos, tabla usuario.
@@ -36,17 +80,12 @@ public class ProyectoIgnacioCAD
      */
     public int insertarUsuario(usuario usuario) throws excepcionProyecto
     {
+        conexion();
         String dml = "INSERT INTO usuario (id_usuario, correo, nombre, apellido1, apellido2, telefono, telefonoEmergencia, nombreUsuario) "
                 + "VALUES (sequence_usuario.NEXTVAL,?,?,?,?,?,?,?)";
         int resultado = 0;
-
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setString(1, usuario.getCorreo());
             sentenciaPreparada.setString(2, usuario.getNombre());
@@ -63,12 +102,6 @@ public class ProyectoIgnacioCAD
             sentenciaPreparada.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -121,15 +154,11 @@ public class ProyectoIgnacioCAD
      */
     public int eliminarUsuario(Integer idUsuario) throws excepcionProyecto
     {
+        conexion();
         String dml = "DELETE FROM usuario WHERE id_usuario = " + idUsuario;
         int resultado = 0;
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -139,12 +168,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -172,6 +195,7 @@ public class ProyectoIgnacioCAD
 
     public int modificarUsuario(usuario usuario) throws excepcionProyecto
     {
+        conexion();
         String dml = "UPDATE usuario SET correo='" + usuario.correo + "', nombre='" + usuario.nombre + "', apellido1='" + usuario.apellido1 + "', "
                 + "apellido2='" + usuario.apellido2 + "', telefono='" + usuario.telefono + "', telefonoEmergencia='" + usuario.telefonoEmergencia + "', "
                 + "nombreUsuario='" + usuario.nombreUsuario + "' WHERE id_usuario = " + usuario.getIdUsuario();
@@ -179,11 +203,6 @@ public class ProyectoIgnacioCAD
 
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -193,12 +212,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -236,15 +249,11 @@ public class ProyectoIgnacioCAD
 
     public usuario leerUsuario(Integer idUsuario) throws excepcionProyecto
     {
+        conexion();
         String dql = "SELECT * FROM usuario WHERE id_usuario = " + idUsuario;
         usuario usuario = new usuario();
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -265,12 +274,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -291,15 +294,11 @@ public class ProyectoIgnacioCAD
 
     public ArrayList<usuario> leerUsuarios() throws excepcionProyecto
     {
+        conexion();
         String dql = "SELECT * FROM usuario";
         ArrayList<usuario> usuarios = new ArrayList<>();
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -323,12 +322,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -349,6 +342,7 @@ public class ProyectoIgnacioCAD
     //----------Entrenamiento-----------//
     public int insertarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
+        conexion();
         String dml = "INSERT INTO entrenamiento (ID_ENTRENAMIENTO, NOMBRE, FECHA, PLAZAS, ID_USUARIO_ENTRENADOR, ID_USUARIO_DEPORTISTA) "
                 + "VALUES (sequence_entrenamiento.NEXTVAL,'" + entrenamiento.getNombre() + "','" + entrenamiento.getFecha() + "'," + entrenamiento.getPlazas() + ","
                 + entrenamiento.getIdUsuarioEntrenador().getIdUsuario() + "," + entrenamiento.getIdUsuarioDeportista().getIdUsuario() + ")";
@@ -356,13 +350,8 @@ public class ProyectoIgnacioCAD
 
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentenciaPreparada = conexion.createStatement();
-            
+
             //En el entrenamiento no tengo que meter un objeto usuario, solo tengo que meter el numero INTEGER
 //            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
 //            sentenciaPreparada.setString(1, entrenamiento.getNombre());
@@ -370,7 +359,6 @@ public class ProyectoIgnacioCAD
 //            sentenciaPreparada.setObject(3, entrenamiento.getPlazas(), Types.INTEGER);
 //            sentenciaPreparada.setObject(4, entrenamiento.getIdUsuarioEntrenador());
 //            sentenciaPreparada.setObject(5, entrenamiento.getIdUsuarioDeportista());
-
             //----- Lanzamiento de una sentencia DQL
             resultado = sentenciaPreparada.executeUpdate(dml);
 
@@ -378,12 +366,6 @@ public class ProyectoIgnacioCAD
             sentenciaPreparada.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -430,15 +412,11 @@ public class ProyectoIgnacioCAD
 
     public int eliminarEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
+        conexion();
         String dml = "DELETE FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
         int resultado = 0;
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -448,12 +426,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -477,17 +449,13 @@ public class ProyectoIgnacioCAD
 
     public int modificarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
+        conexion();
         String dml = "UPDATE entrenamiento SET nombre='" + entrenamiento.nombre + "', fecha='" + entrenamiento.fecha + "', ID_USUARIO_DEPORTISTA='" + entrenamiento.idUsuarioDeportista + "', "
                 + "ID_USUARIO_ENTRENADOR='" + entrenamiento.idUsuarioEntrenador + "', plazas='" + entrenamiento.plazas + "' WHERE id_entrenamiento = " + entrenamiento.idEntrenamiento;
         int resultado = 0;
 
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -497,12 +465,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -545,15 +507,11 @@ public class ProyectoIgnacioCAD
 
     public entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
+        conexion();
         String dql = "SELECT * FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
         entrenamiento entrenamiento = new entrenamiento();
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -573,12 +531,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
@@ -599,15 +551,11 @@ public class ProyectoIgnacioCAD
 
     public ArrayList<entrenamiento> leerEntrenamientos() throws excepcionProyecto
     {
+        conexion();
         String dql = "SELECT * FROM entrenamiento";
         ArrayList<entrenamiento> entrenamientos = new ArrayList<>();
         try
         {
-            //----- Acciones Previas: Cargar Driver en Memoria + Crear Conexión
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            //Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
-
             Statement sentencia = conexion.createStatement();
 
             //----- Lanzamiento de una sentencia DQL
@@ -630,12 +578,6 @@ public class ProyectoIgnacioCAD
             sentencia.close();
             conexion.close();
 
-        } catch (ClassNotFoundException ex)
-        {
-            excepcionProyecto e = new excepcionProyecto();
-            e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            throw e;
         } catch (SQLException ex)
         {
             excepcionProyecto e = new excepcionProyecto();
