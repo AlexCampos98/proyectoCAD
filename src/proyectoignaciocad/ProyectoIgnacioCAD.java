@@ -20,6 +20,7 @@ import java.util.ArrayList;
  */
 public class ProyectoIgnacioCAD
 {
+
     Connection conexion;
 
     /**
@@ -119,10 +120,6 @@ public class ProyectoIgnacioCAD
                     e.setMensajeErrorUsuario("La check, preguntar a Ignacio.");
                     break;
 
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-                    break;
-
                 case 20003:
                     e.setMensajeErrorUsuario("No puede haber mas vocales que consonantes en la union del nombre y los apellidos.");
                     break;
@@ -170,15 +167,11 @@ public class ProyectoIgnacioCAD
             excepcionProyecto e = new excepcionProyecto();
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setSentenciaSQL(dml+" -> ? = " + idUsuario);
+            e.setSentenciaSQL(dml + " -> ? = " + idUsuario);
             switch (ex.getErrorCode())
             {
                 case 2292:
                     e.setMensajeErrorUsuario("No se puede eliminar al usuario, debido a que esta relacionado con algun entrenamiento.");
-                    break;
-
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
                     break;
 
                 default:
@@ -223,10 +216,6 @@ public class ProyectoIgnacioCAD
                     break;
                 case 2290: //Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
                     e.setMensajeErrorUsuario("La check, preguntar a Ignacio.");
-                    break;
-
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
                     break;
 
                 case 20003:
@@ -275,15 +264,7 @@ public class ProyectoIgnacioCAD
         {
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
-
-            if (ex.getErrorCode() == 17008)
-            {
-                e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-            } else
-            {
-                e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
-
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
             throw e;
         }
         return usuario;
@@ -323,14 +304,8 @@ public class ProyectoIgnacioCAD
         {
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
-            if (ex.getErrorCode() == 17008)
-            {
-                e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-            } else
-            {
-                e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
             throw e;
         }
         return usuarios;
@@ -352,7 +327,7 @@ public class ProyectoIgnacioCAD
             sentenciaPreparada.setObject(3, entrenamiento.getPlazas(), Types.INTEGER);
             sentenciaPreparada.setObject(4, entrenamiento.getIdUsuarioEntrenador().getIdUsuario(), Types.INTEGER);
             sentenciaPreparada.setObject(5, entrenamiento.getIdUsuarioDeportista().getIdUsuario(), Types.INTEGER);
-            
+
             //----- Lanzamiento de una sentencia DQL
             resultado = sentenciaPreparada.executeUpdate();
 
@@ -379,10 +354,6 @@ public class ProyectoIgnacioCAD
 
                 case 2290:
                     e.setMensajeErrorUsuario("No puede haber un numero negativo de plazas.");
-                    break;
-
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
                     break;
 
                 case 20001:
@@ -425,16 +396,7 @@ public class ProyectoIgnacioCAD
             excepcionProyecto e = new excepcionProyecto();
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorAdministrador(ex.getMessage());
-            switch (ex.getErrorCode())
-            {
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-                    break;
-
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-                    break;
-            }
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
             e.setSentenciaSQL(dml);
             throw e;
         }
@@ -474,10 +436,6 @@ public class ProyectoIgnacioCAD
 
                 case 2290:
                     e.setMensajeErrorUsuario("No puede haber un numero negativo de plazas.");
-                    break;
-
-                case 17008:
-                    e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
                     break;
 
                 case 20001:
@@ -529,14 +487,7 @@ public class ProyectoIgnacioCAD
         {
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
-
-            if (ex.getErrorCode() == 17008)
-            {
-                e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-            } else
-            {
-                e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
             throw e;
         }
@@ -576,14 +527,8 @@ public class ProyectoIgnacioCAD
         {
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
-            if (ex.getErrorCode() == 17008)
-            {
-                e.setMensajeErrorUsuario("Se ha perdido la conexion. Vuelva a intentarlo mas tarde");
-            } else
-            {
-                e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
             throw e;
         }
         return entrenamientos;
