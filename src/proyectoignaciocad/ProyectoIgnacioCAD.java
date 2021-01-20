@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class ProyectoIgnacioCAD
 {
 
+    
     //----------Usuario-----------//
     /**
      * Inserta un registro de usuario a la base de datos, tabla usuario.
@@ -56,7 +57,7 @@ public class ProyectoIgnacioCAD
             sentenciaPreparada.setString(7, usuario.getNombreUsuario());
 
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentenciaPreparada.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
             sentenciaPreparada.close();
@@ -362,6 +363,7 @@ public class ProyectoIgnacioCAD
 
             Statement sentenciaPreparada = conexion.createStatement();
             
+            //En el entrenamiento no tengo que meter un objeto usuario, solo tengo que meter el numero INTEGER
 //            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
 //            sentenciaPreparada.setString(1, entrenamiento.getNombre());
 //            sentenciaPreparada.setObject(2, entrenamiento.getFecha(), Types.DATE);
