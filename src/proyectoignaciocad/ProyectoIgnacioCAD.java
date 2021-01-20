@@ -6,7 +6,6 @@
 package proyectoignaciocad;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,8 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -23,7 +20,6 @@ import java.util.logging.Logger;
  */
 public class ProyectoIgnacioCAD
 {
-
     Connection conexion;
 
     /**
@@ -155,17 +151,18 @@ public class ProyectoIgnacioCAD
     public int eliminarUsuario(Integer idUsuario) throws excepcionProyecto
     {
         conexion();
-        String dml = "DELETE FROM usuario WHERE id_usuario = " + idUsuario;
+        String dml = "DELETE FROM usuario WHERE id_usuario = ?";
         int resultado = 0;
         try
         {
-            Statement sentencia = conexion.createStatement();
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setObject(1, idUsuario, Types.INTEGER);
 
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaPreparada.close();
             conexion.close();
 
         } catch (SQLException ex)
@@ -173,6 +170,7 @@ public class ProyectoIgnacioCAD
             excepcionProyecto e = new excepcionProyecto();
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setSentenciaSQL(dml+" -> ? = " + idUsuario);
             switch (ex.getErrorCode())
             {
                 case 2292:
@@ -187,7 +185,6 @@ public class ProyectoIgnacioCAD
                     e.setMensajeErrorUsuario("Error al realizar la eliminacion. Compruebe los datos.");
                     break;
             }
-            e.setSentenciaSQL(dml);
             throw e;
         }
         return resultado;
@@ -344,23 +341,20 @@ public class ProyectoIgnacioCAD
     {
         conexion();
         String dml = "INSERT INTO entrenamiento (ID_ENTRENAMIENTO, NOMBRE, FECHA, PLAZAS, ID_USUARIO_ENTRENADOR, ID_USUARIO_DEPORTISTA) "
-                + "VALUES (sequence_entrenamiento.NEXTVAL,'" + entrenamiento.getNombre() + "','" + entrenamiento.getFecha() + "'," + entrenamiento.getPlazas() + ","
-                + entrenamiento.getIdUsuarioEntrenador().getIdUsuario() + "," + entrenamiento.getIdUsuarioDeportista().getIdUsuario() + ")";
+                + "VALUES (sequence_entrenamiento.NEXTVAL,?,?,?,?,?)";
         int resultado = 0;
 
         try
         {
-            Statement sentenciaPreparada = conexion.createStatement();
-
-            //En el entrenamiento no tengo que meter un objeto usuario, solo tengo que meter el numero INTEGER
-//            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-//            sentenciaPreparada.setString(1, entrenamiento.getNombre());
-//            sentenciaPreparada.setObject(2, entrenamiento.getFecha(), Types.DATE);
-//            sentenciaPreparada.setObject(3, entrenamiento.getPlazas(), Types.INTEGER);
-//            sentenciaPreparada.setObject(4, entrenamiento.getIdUsuarioEntrenador());
-//            sentenciaPreparada.setObject(5, entrenamiento.getIdUsuarioDeportista());
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setString(1, entrenamiento.getNombre());
+            sentenciaPreparada.setObject(2, entrenamiento.getFecha(), Types.DATE);
+            sentenciaPreparada.setObject(3, entrenamiento.getPlazas(), Types.INTEGER);
+            sentenciaPreparada.setObject(4, entrenamiento.getIdUsuarioEntrenador().getIdUsuario(), Types.INTEGER);
+            sentenciaPreparada.setObject(5, entrenamiento.getIdUsuarioDeportista().getIdUsuario(), Types.INTEGER);
+            
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentenciaPreparada.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
             sentenciaPreparada.close();
