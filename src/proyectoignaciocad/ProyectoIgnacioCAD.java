@@ -5,6 +5,7 @@
  */
 package proyectoignaciocad;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import javafx.animation.KeyValue;
 
 /**
  *
@@ -183,23 +185,36 @@ public class ProyectoIgnacioCAD
         return resultado;
     }
 
+    /**
+     * Modifica un registro de la tabla usuario. No se modifica el identificador.
+     * @param usuario Objeto de tipo usuario con los datos para proceder a la modficacion
+     * @return 0. No devuelve la cantidad de registros modificados.
+     * @throws excepcionProyecto Cuando se produzca cualquier error en la conexio o sentencia SQL.
+     */
     public int modificarUsuario(usuario usuario) throws excepcionProyecto
     {
         conectar();
-        String dml = "UPDATE usuario SET correo='" + usuario.correo + "', nombre='" + usuario.nombre + "', apellido1='" + usuario.apellido1 + "', "
-                + "apellido2='" + usuario.apellido2 + "', telefono='" + usuario.telefono + "', telefonoEmergencia='" + usuario.telefonoEmergencia + "', "
-                + "nombreUsuario='" + usuario.nombreUsuario + "' WHERE id_usuario = " + usuario.getIdUsuario();
-        int resultado = 0;
+
+        String llamada = "call modificar_usuario(?,?,?,?,?,?,?,?)";
+
 
         try
         {
-            Statement sentencia = conexion.createStatement();
+            CallableStatement sentenciaLlamable = conexion.prepareCall(llamada);
+            sentenciaLlamable.setObject(1, usuario.getIdUsuario(), Types.INTEGER);
+            sentenciaLlamable.setString(2, usuario.getCorreo());
+            sentenciaLlamable.setString(3, usuario.getNombre());
+            sentenciaLlamable.setString(4, usuario.getApellido1());
+            sentenciaLlamable.setString(5, usuario.getApellido2());
+            sentenciaLlamable.setString(6, usuario.getTelefono());
+            sentenciaLlamable.setString(7, usuario.getTelefonoEmergencia());
+            sentenciaLlamable.setString(8, usuario.getNombreUsuario());
 
-            //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            //----- Lanzamiento del procedimiento
+            sentenciaLlamable.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaLlamable.close();
             conexion.close();
 
         } catch (SQLException ex)
@@ -207,13 +222,18 @@ public class ProyectoIgnacioCAD
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
-            e.setSentenciaSQL(dml);
+            e.setSentenciaSQL(llamada);
 
             switch (ex.getErrorCode())
             {
                 case 1:
                     e.setMensajeErrorUsuario("El correo, el nombre de usuario o el telefono no pueden ser iguales que los de otros usuarios.");
                     break;
+
+                case 1407:
+                    e.setMensajeErrorUsuario("Es obligatorio rellenar todos los datos.");
+                    break;
+
                 case 2290: //Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
                     e.setMensajeErrorUsuario("La check, preguntar a Ignacio.");
                     break;
@@ -230,7 +250,7 @@ public class ProyectoIgnacioCAD
             throw e;
         }
 
-        return resultado;
+        return 0;
     }
 
     public usuario leerUsuario(Integer idUsuario) throws excepcionProyecto
@@ -403,22 +423,33 @@ public class ProyectoIgnacioCAD
         return resultado;
     }
 
+    /**
+     * 
+     * @param entrenamiento
+     * @return 0. No devuelve el numero de registros modificados.
+     * @throws excepcionProyecto 
+     */
     public int modificarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
-        conectar();
-        String dml = "UPDATE entrenamiento SET nombre='" + entrenamiento.nombre + "', fecha='" + entrenamiento.fecha + "', ID_USUARIO_DEPORTISTA='" + entrenamiento.idUsuarioDeportista + "', "
-                + "ID_USUARIO_ENTRENADOR='" + entrenamiento.idUsuarioEntrenador + "', plazas='" + entrenamiento.plazas + "' WHERE id_entrenamiento = " + entrenamiento.idEntrenamiento;
-        int resultado = 0;
+        conectar();        
+        String llamada = "call modificar_entrenamiento(?,?,?,?,?,?)";
 
         try
         {
-            Statement sentencia = conexion.createStatement();
+            CallableStatement sentenciaLlamada = conexion.prepareCall(llamada);
 
+            sentenciaLlamada.setObject(1, entrenamiento.getIdEntrenamiento(), Types.INTEGER);
+            sentenciaLlamada.setString(2, entrenamiento.getNombre());
+            sentenciaLlamada.setObject(3, entrenamiento.fecha, Types.DATE);
+            sentenciaLlamada.setObject(4, entrenamiento.getPlazas(), Types.INTEGER);
+            sentenciaLlamada.setObject(5, entrenamiento.getIdUsuarioEntrenador().getIdUsuario(), Types.INTEGER);
+            sentenciaLlamada.setObject(6, entrenamiento.getIdUsuarioDeportista().getIdUsuario(), Types.INTEGER);
+            
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            sentenciaLlamada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaLlamada.close();
             conexion.close();
 
         } catch (SQLException ex)
@@ -426,7 +457,7 @@ public class ProyectoIgnacioCAD
             excepcionProyecto e = new excepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
-            e.setSentenciaSQL(dml);
+            e.setSentenciaSQL(llamada);
 
             switch (ex.getErrorCode())
             {
@@ -454,7 +485,7 @@ public class ProyectoIgnacioCAD
             throw e;
         }
 
-        return resultado;
+        return 0;
     }
 
     public entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
@@ -497,7 +528,7 @@ public class ProyectoIgnacioCAD
     public ArrayList<entrenamiento> leerEntrenamientos() throws excepcionProyecto
     {
         conectar();
-        String dql = "SELECT * FROM entrenamiento";
+        String dql = "SELECT * FROM entrenamiento e, usuario u, usuario u2 WHERE e.id_usuario_deportista = u.id_usuario AND e.id_usuario_entrenador = u2.id_usuario";
         ArrayList<entrenamiento> entrenamientos = new ArrayList<>();
         try
         {
@@ -516,6 +547,10 @@ public class ProyectoIgnacioCAD
 //                entrenamiento.setIdUsuarioEntrenador(resultado.getInt("id_usuario"));
                 entre.setNombre(resultado.getString("nombre"));
                 entre.setPlazas(resultado.getInt("plazas"));
+                
+//                usuario entrenador = new usuario(resultado.getInt("id_usuario"), dql, dql, dql, dql, dql, dql, dql);
+//                usuario deportista = new usuario(Integer.MIN_VALUE, dql, dql, dql, dql, dql, dql, dql);
+                
                 entrenamientos.add(entre);
             }
 
