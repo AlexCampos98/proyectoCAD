@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import javafx.animation.KeyValue;
 
 /**
  *
@@ -26,7 +25,7 @@ public class ProyectoIgnacioCAD
     Connection conexion;
 
     /**
-     * Carga el Driver en Memoria
+     * Constructor con la carga del Driver en Memoria
      *
      * @throws proyectoignaciocad.excepcionProyecto Cuando se produzca cualquier
      * error
@@ -48,7 +47,7 @@ public class ProyectoIgnacioCAD
     /**
      * Metodo usado para conectar con la BD
      *
-     * @throws excepcionProyecto
+     * @throws excepcionProyecto Cuando se produzca cualquier error
      */
     private void conectar() throws excepcionProyecto
     {
@@ -186,17 +185,20 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Modifica un registro de la tabla usuario. No se modifica el identificador.
-     * @param usuario Objeto de tipo usuario con los datos para proceder a la modficacion
+     * Modifica un registro de la tabla usuario. No se modifica el
+     * identificador.
+     *
+     * @param usuario Objeto de tipo usuario con los datos para proceder a la
+     * modficacion
      * @return 0. No devuelve la cantidad de registros modificados.
-     * @throws excepcionProyecto Cuando se produzca cualquier error en la conexio o sentencia SQL.
+     * @throws excepcionProyecto Cuando se produzca cualquier error en la
+     * conexio o sentencia SQL.
      */
     public int modificarUsuario(usuario usuario) throws excepcionProyecto
     {
         conectar();
 
         String llamada = "call modificar_usuario(?,?,?,?,?,?,?,?)";
-
 
         try
         {
@@ -253,6 +255,14 @@ public class ProyectoIgnacioCAD
         return 0;
     }
 
+    /**
+     * Lectura de los datos de la tabla usuario, buscando por la id del usuario.
+     *
+     * @param idUsuario Numero de busqueda por ID. Tipo INTEGER.
+     * @return Devuelve un objeto de tipo usuario con los datos del usaurio
+     * selecionado.
+     * @throws excepcionProyecto Devuelve cualquier error.
+     */
     public usuario leerUsuario(Integer idUsuario) throws excepcionProyecto
     {
         conectar();
@@ -290,6 +300,13 @@ public class ProyectoIgnacioCAD
         return usuario;
     }
 
+    /**
+     * Lectura de todos los registros de la tabla usuario.
+     *
+     * @return Devuelve un arrayList con objetos usuario con todos los registros
+     * de la tabla usuario.
+     * @throws excepcionProyecto Devuelve cualquier tipo de error.
+     */
     public ArrayList<usuario> leerUsuarios() throws excepcionProyecto
     {
         conectar();
@@ -332,6 +349,14 @@ public class ProyectoIgnacioCAD
     }
 
     //----------Entrenamiento-----------//
+    /**
+     * Inserta un registro en la tabla de entrenamiento
+     *
+     * @param entrenamiento Objeto entrenamiento con los datos necesarios para
+     * la insercion de los mismos en la BD.
+     * @return El numero de registros afectados.
+     * @throws excepcionProyecto Devuelve cualquier tipo de error.
+     */
     public int insertarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
         conectar();
@@ -395,20 +420,29 @@ public class ProyectoIgnacioCAD
         return resultado;
     }
 
+    /**
+     * Eliminacion de un registro de la tabla usuario, por el identificador del
+     * entrenamiento
+     *
+     * @param idEntrenamiento Numero de identificador de la tabla entrenamiento.
+     * @return Devuelve el numero de registros afectados.
+     * @throws excepcionProyecto Devuelve cualquier error.
+     */
     public int eliminarEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
         conectar();
-        String dml = "DELETE FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
+        String dml = "DELETE FROM entrenamiento WHERE id_entrenamiento = ?";
         int resultado = 0;
         try
         {
-            Statement sentencia = conexion.createStatement();
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setObject(1, idEntrenamiento, Types.INTEGER);
 
             //----- Lanzamiento de una sentencia DQL
-            resultado = sentencia.executeUpdate(dml);
+            resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
-            sentencia.close();
+            sentenciaPreparada.close();
             conexion.close();
 
         } catch (SQLException ex)
@@ -424,14 +458,16 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * 
-     * @param entrenamiento
+     * Modificacion de un registro de la tabla entrenamiento
+     *
+     * @param entrenamiento Objeto entrenamiento con los datos necesarios para
+     * la modificacion del registro.
      * @return 0. No devuelve el numero de registros modificados.
-     * @throws excepcionProyecto 
+     * @throws excepcionProyecto Devuelve cualquer errror producido.
      */
     public int modificarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
     {
-        conectar();        
+        conectar();
         String llamada = "call modificar_entrenamiento(?,?,?,?,?,?)";
 
         try
@@ -444,7 +480,7 @@ public class ProyectoIgnacioCAD
             sentenciaLlamada.setObject(4, entrenamiento.getPlazas(), Types.INTEGER);
             sentenciaLlamada.setObject(5, entrenamiento.getIdUsuarioEntrenador().getIdUsuario(), Types.INTEGER);
             sentenciaLlamada.setObject(6, entrenamiento.getIdUsuarioDeportista().getIdUsuario(), Types.INTEGER);
-            
+
             //----- Lanzamiento de una sentencia DQL
             sentenciaLlamada.executeUpdate();
 
@@ -488,10 +524,29 @@ public class ProyectoIgnacioCAD
         return 0;
     }
 
+    /**
+     * Lectura de un registro de la tabla entrenamiento, buscado por su
+     * identificador.
+     *
+     * @param idEntrenamiento Identificador del registro de la tabla de
+     * entrenamiento.
+     * @return Devuelve un objeto de tipo entrenamiento, con los datos del
+     * registro.
+     * @throws excepcionProyecto Devuelve cualquier error.
+     */
     public entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
     {
         conectar();
         String dql = "SELECT * FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
+
+        /*
+        *   Posible solucion
+        *   SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador
+            , e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, d.apellido1 AS apellido1Deportista, 
+            d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista
+            FROM entrenamiento a, usuario e, usuario d 
+            WHERE id_entrenamiento = 1 AND e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario;
+         */
         entrenamiento entrenamiento = new entrenamiento();
         try
         {
@@ -525,6 +580,13 @@ public class ProyectoIgnacioCAD
         return entrenamiento;
     }
 
+    /**
+     * Lectura de todos los datos de la tabla entrenamiento.
+     *
+     * @return Devuelve un arrayList con objetos de tipo entrenamiento, con los
+     * datos de cada registro.
+     * @throws excepcionProyecto Devuelve cualquier error.
+     */
     public ArrayList<entrenamiento> leerEntrenamientos() throws excepcionProyecto
     {
         conectar();
@@ -547,10 +609,9 @@ public class ProyectoIgnacioCAD
 //                entrenamiento.setIdUsuarioEntrenador(resultado.getInt("id_usuario"));
                 entre.setNombre(resultado.getString("nombre"));
                 entre.setPlazas(resultado.getInt("plazas"));
-                
+
 //                usuario entrenador = new usuario(resultado.getInt("id_usuario"), dql, dql, dql, dql, dql, dql, dql);
 //                usuario deportista = new usuario(Integer.MIN_VALUE, dql, dql, dql, dql, dql, dql, dql);
-                
                 entrenamientos.add(entre);
             }
 
@@ -568,4 +629,6 @@ public class ProyectoIgnacioCAD
         }
         return entrenamientos;
     }
+    
+    
 }
