@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package proyectoignaciocad;
+package proyectocad;
 
 /**
  *
  * @author Alejandro Campos Maestre
  */
-public class excepcionProyecto extends Exception
+public class ExcepcionProyecto extends Exception
 {
     String mensajeErrorUsuario, mensajeErrorAdministrador, sentenciaSQL;
     Integer codigoError;
@@ -17,7 +17,7 @@ public class excepcionProyecto extends Exception
     /**
      * Constructor vacio de la clase
      */
-    public excepcionProyecto()
+    public ExcepcionProyecto()
     {
     }
 
@@ -28,7 +28,7 @@ public class excepcionProyecto extends Exception
      * @param sentenciaSQL Sentencia SQL que inicio el error
      * @param codigoError  Codigo de error que devuelve la BD.
      */
-    public excepcionProyecto(String mensajeErrorUsuario, String mensajeErrorAdministrador, String sentenciaSQL, Integer codigoError)
+    public ExcepcionProyecto(String mensajeErrorUsuario, String mensajeErrorAdministrador, String sentenciaSQL, Integer codigoError)
     {
         this.mensajeErrorUsuario = mensajeErrorUsuario;
         this.mensajeErrorAdministrador = mensajeErrorAdministrador;

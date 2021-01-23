@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package proyectoignaciocad;
+package proyectocad;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -14,30 +14,58 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Alejandro Campos Maestre
  */
-public class ProyectoIgnacioCAD
+public class ProyectoCAD
 {
 
     Connection conexion;
+    String IP, nombreBD, contraseñaBD;
 
     /**
      * Constructor con la carga del Driver en Memoria
      *
-     * @throws proyectoignaciocad.excepcionProyecto Cuando se produzca cualquier
-     * error
+     * @throws proyectocad.ExcepcionProyecto Devuelve el error al intentar cargar el Driver
      */
-    public ProyectoIgnacioCAD() throws excepcionProyecto
+    public ProyectoCAD() throws ExcepcionProyecto
     {
         try
         {
             Class.forName("oracle.jdbc.driver.OracleDriver");
+            IP = null;
         } catch (ClassNotFoundException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
+            e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            throw e;
+        }
+    }
+
+    /**
+     * Constructor con los datos necesarios para proceder a conectarse a una BD Oracle.
+     * @param IP Direccion de la interfaz en red del servidor BD
+     * @param nombreBD Nombre de la BD
+     * @param contraseñaBD Contraseña de la BD
+     * @throws proyectocad.ExcepcionProyecto Devuelve el error al intentar cargar el Driver
+     */
+    public ProyectoCAD(String IP, String nombreBD, String contraseñaBD) throws ExcepcionProyecto
+    {
+        try
+        {
+            this.IP = IP;
+            this.nombreBD = nombreBD;
+            this.contraseñaBD = contraseñaBD;
+            
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        } catch (ClassNotFoundException ex)
+        {
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
             throw e;
@@ -47,17 +75,23 @@ public class ProyectoIgnacioCAD
     /**
      * Metodo usado para conectar con la BD
      *
-     * @throws excepcionProyecto Cuando se produzca cualquier error
+     * @throws ExcepcionProyecto Cuando se produzca cualquier error
      */
-    private void conectar() throws excepcionProyecto
+    private void conectar() throws ExcepcionProyecto
     {
         try
         {
-            //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
-            conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
+            if (IP == null)
+            {
+                //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
+                conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
+            } else
+            {
+                conexion = DriverManager.getConnection("jdbc:oracle:thin:@" + IP + ":1521:test", nombreBD, contraseñaBD);
+            }
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
@@ -67,16 +101,13 @@ public class ProyectoIgnacioCAD
 
     //----------Usuario-----------//
     /**
-     * Inserta un registro de usuario a la base de datos, tabla usuario.
-     * Devuelve el numero de registros insertados.
+     * Inserta un registro de Usuario a la base de datos, tabla Usuario.
      *
-     * @param usuario Clase solicitada con los datos necesarios del usuario para
-     * inserta en la BD.
+     * @param usuario Clase solicitada con los datos necesarios del Usuario para inserta en la BD.
      * @return Cantidad de registros añadidos
-     * @throws excepcionProyecto Cuando se produzca cualquier error con la
-     * conexion o con excepciones SQL.
+     * @throws ExcepcionProyecto Cuando se produzca cualquier error con la conexion o con excepciones SQL.
      */
-    public int insertarUsuario(usuario usuario) throws excepcionProyecto
+    public int insertarUsuario(Usuario usuario) throws ExcepcionProyecto
     {
         conectar();
         String dml = "INSERT INTO usuario (id_usuario, correo, nombre, apellido1, apellido2, telefono, telefonoEmergencia, nombreUsuario) "
@@ -102,7 +133,7 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
             e.setSentenciaSQL(dml);
@@ -114,11 +145,11 @@ public class ProyectoIgnacioCAD
                     break;
 
                 case 1400:
-                    e.setMensajeErrorUsuario("No puede haber ningun campo vacio.");
+                    e.setMensajeErrorUsuario("No puedes dejar ningun dato sin rellenar.");
                     break;
 
-                case 2290: //Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
-                    e.setMensajeErrorUsuario("La check, preguntar a Ignacio.");
+                case 2290: //FIXME Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
+                    e.setMensajeErrorUsuario("El correo debe seguir los parametros normalizados (____@___.__) y el numero de telefono no puede ser el mismo numero que el de emergencia.");
                     break;
 
                 case 20003:
@@ -137,16 +168,16 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Elimina el registro de la tabla usuario. Necesita el identificador del
+     * Elimina el registro de la tabla Usuario. Necesita el identificador del
      * registro.
      *
-     * @param idUsuario indica el valor del campo usuario.id_usuario del
+     * @param idUsuario indica el valor del campo Usuario.id_usuario del
      * registro a eliminar
      * @return Cantidad de registros eliminados
-     * @throws excepcionProyecto Cuando se produzca cualquier excepcion en la
+     * @throws ExcepcionProyecto Cuando se produzca cualquier excepcion en la
      * conexion a la BD
      */
-    public int eliminarUsuario(Integer idUsuario) throws excepcionProyecto
+    public int eliminarUsuario(Integer idUsuario) throws ExcepcionProyecto
     {
         conectar();
         String dml = "DELETE FROM usuario WHERE id_usuario = ?";
@@ -165,14 +196,14 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorAdministrador(ex.getMessage());
-            e.setSentenciaSQL(dml + " -> ? = " + idUsuario);
+            e.setSentenciaSQL(dml + " --> ? = " + idUsuario);
             switch (ex.getErrorCode())
             {
                 case 2292:
-                    e.setMensajeErrorUsuario("No se puede eliminar al usuario, debido a que esta relacionado con algun entrenamiento.");
+                    e.setMensajeErrorUsuario("No se puede eliminar al usuario, ya que esta alistado en al menos un entrenamiento.");
                     break;
 
                 default:
@@ -185,16 +216,15 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Modifica un registro de la tabla usuario. No se modifica el
+     * Modifica un registro de la tabla Usuario. No se modifica el
      * identificador.
      *
-     * @param usuario Objeto de tipo usuario con los datos para proceder a la
+     * @param usuario Objeto de tipo Usuario con los datos para proceder a la
      * modficacion
-     * @return 0. No devuelve la cantidad de registros modificados.
-     * @throws excepcionProyecto Cuando se produzca cualquier error en la
+     * @throws ExcepcionProyecto Cuando se produzca cualquier error en la
      * conexio o sentencia SQL.
      */
-    public int modificarUsuario(usuario usuario) throws excepcionProyecto
+    public void modificarUsuario(Usuario usuario) throws ExcepcionProyecto
     {
         conectar();
 
@@ -221,7 +251,7 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
             e.setSentenciaSQL(llamada);
@@ -229,15 +259,15 @@ public class ProyectoIgnacioCAD
             switch (ex.getErrorCode())
             {
                 case 1:
-                    e.setMensajeErrorUsuario("El correo, el nombre de usuario o el telefono no pueden ser iguales que los de otros usuarios.");
+                    e.setMensajeErrorUsuario("El correo, el nombre de usuario y el telefono no pueden ser iguales que los de otros usuarios.");
                     break;
 
                 case 1407:
                     e.setMensajeErrorUsuario("Es obligatorio rellenar todos los datos.");
                     break;
 
-                case 2290: //Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
-                    e.setMensajeErrorUsuario("La check, preguntar a Ignacio.");
+                case 2290: //FIXME Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
+                    e.setMensajeErrorUsuario("El correo debe seguir los parametros normalizados (____@___.__) y el numero de telefono no puede ser el mismo numero que el de emergencia.");
                     break;
 
                 case 20003:
@@ -251,23 +281,21 @@ public class ProyectoIgnacioCAD
 
             throw e;
         }
-
-        return 0;
     }
 
     /**
-     * Lectura de los datos de la tabla usuario, buscando por la id del usuario.
+     * Lectura de los datos de la tabla Usuario, buscando por la id del Usuario.
      *
      * @param idUsuario Numero de busqueda por ID. Tipo INTEGER.
-     * @return Devuelve un objeto de tipo usuario con los datos del usaurio
+     * @return Devuelve un objeto de tipo Usuario con los datos del usaurio
      * selecionado.
-     * @throws excepcionProyecto Devuelve cualquier error.
+     * @throws ExcepcionProyecto Devuelve cualquier error.
      */
-    public usuario leerUsuario(Integer idUsuario) throws excepcionProyecto
+    public Usuario leerUsuario(Integer idUsuario) throws ExcepcionProyecto
     {
         conectar();
         String dql = "SELECT * FROM usuario WHERE id_usuario = " + idUsuario;
-        usuario usuario = new usuario();
+        Usuario usuario = new Usuario();
         try
         {
             Statement sentencia = conexion.createStatement();
@@ -292,8 +320,10 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setCodigoError(ex.getErrorCode());
+            e.setSentenciaSQL(dql);
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
             throw e;
         }
@@ -301,17 +331,16 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Lectura de todos los registros de la tabla usuario.
+     * Lectura de todos los registros de la tabla Usuario.
      *
-     * @return Devuelve un arrayList con objetos usuario con todos los registros
-     * de la tabla usuario.
-     * @throws excepcionProyecto Devuelve cualquier tipo de error.
+     * @return Devuelve un arrayList con objetos Usuario con todos los registros de la tabla Usuario.
+     * @throws ExcepcionProyecto Devuelve cualquier tipo de error.
      */
-    public ArrayList<usuario> leerUsuarios() throws excepcionProyecto
+    public ArrayList<Usuario> leerUsuarios() throws ExcepcionProyecto
     {
         conectar();
         String dql = "SELECT * FROM usuario";
-        ArrayList<usuario> usuarios = new ArrayList<>();
+        ArrayList<Usuario> usuarios = new ArrayList<>();
         try
         {
             Statement sentencia = conexion.createStatement();
@@ -321,7 +350,7 @@ public class ProyectoIgnacioCAD
 
             while (resultado.next())
             {
-                usuario usu = new usuario();
+                Usuario usu = new Usuario();
                 usu.setApellido1(resultado.getString("apellido1"));
                 usu.setApellido2(resultado.getString("apellido2"));
                 usu.setCorreo(resultado.getString("correo"));
@@ -339,8 +368,10 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
+            e.setSentenciaSQL(dql);
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
             throw e;
@@ -350,14 +381,13 @@ public class ProyectoIgnacioCAD
 
     //----------Entrenamiento-----------//
     /**
-     * Inserta un registro en la tabla de entrenamiento
+     * Inserta un registro en la tabla de Entrenamiento
      *
-     * @param entrenamiento Objeto entrenamiento con los datos necesarios para
-     * la insercion de los mismos en la BD.
+     * @param entrenamiento Objeto Entrenamiento con los datos necesarios para la insercion de los mismos en la BD.
      * @return El numero de registros afectados.
-     * @throws excepcionProyecto Devuelve cualquier tipo de error.
+     * @throws ExcepcionProyecto Devuelve cualquier tipo de error.
      */
-    public int insertarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
+    public int insertarEntrenamiento(Entrenamiento entrenamiento) throws ExcepcionProyecto
     {
         conectar();
         String dml = "INSERT INTO entrenamiento (ID_ENTRENAMIENTO, NOMBRE, FECHA, PLAZAS, ID_USUARIO_ENTRENADOR, ID_USUARIO_DEPORTISTA) "
@@ -382,7 +412,7 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
             e.setSentenciaSQL(dml);
@@ -394,7 +424,7 @@ public class ProyectoIgnacioCAD
                     break;
 
                 case 2291:
-                    e.setMensajeErrorUsuario("El entrenador o del deportista no existe.");
+                    e.setMensajeErrorUsuario("El entrenador o el deportista no existe.");
                     break;
 
                 case 2290:
@@ -402,7 +432,7 @@ public class ProyectoIgnacioCAD
                     break;
 
                 case 20001:
-                    e.setMensajeErrorUsuario("El deportistas no puede tener mas de dos entrenamientos el mismo dia.");
+                    e.setMensajeErrorUsuario("El deportista no puede tener mas de dos entrenamientos el mismo dia.");
                     break;
 
                 case 20002:
@@ -421,14 +451,13 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Eliminacion de un registro de la tabla usuario, por el identificador del
-     * entrenamiento
+     * Eliminacion de un registro de la tabla Usuario, por el identificador del Entrenamiento
      *
-     * @param idEntrenamiento Numero de identificador de la tabla entrenamiento.
+     * @param idEntrenamiento Numero de identificador de la tabla Entrenamiento.
      * @return Devuelve el numero de registros afectados.
-     * @throws excepcionProyecto Devuelve cualquier error.
+     * @throws ExcepcionProyecto Devuelve cualquier error.
      */
-    public int eliminarEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
+    public int eliminarEntrenamiento(Integer idEntrenamiento) throws ExcepcionProyecto
     {
         conectar();
         String dml = "DELETE FROM entrenamiento WHERE id_entrenamiento = ?";
@@ -447,7 +476,7 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
@@ -458,14 +487,13 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Modificacion de un registro de la tabla entrenamiento
+     * Modificacion de un registro de la tabla Entrenamiento
      *
-     * @param entrenamiento Objeto entrenamiento con los datos necesarios para
-     * la modificacion del registro.
+     * @param entrenamiento Objeto Entrenamiento con los datos necesarios para la modificacion del registro.
      * @return 0. No devuelve el numero de registros modificados.
-     * @throws excepcionProyecto Devuelve cualquer errror producido.
+     * @throws ExcepcionProyecto Devuelve cualquer errror producido.
      */
-    public int modificarEntrenamiento(entrenamiento entrenamiento) throws excepcionProyecto
+    public int modificarEntrenamiento(Entrenamiento entrenamiento) throws ExcepcionProyecto
     {
         conectar();
         String llamada = "call modificar_entrenamiento(?,?,?,?,?,?)";
@@ -490,15 +518,15 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
             e.setCodigoError(ex.getErrorCode());
             e.setSentenciaSQL(llamada);
 
             switch (ex.getErrorCode())
-            {
+            { //FIXME revisar
                 case 2291:
-                    e.setMensajeErrorUsuario("El identificador del entrenador o del deportista no existe.");
+                    e.setMensajeErrorUsuario("El entrenador o el deportista no existe.");
                     break;
 
                 case 2290:
@@ -525,29 +553,23 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Lectura de un registro de la tabla entrenamiento, buscado por su
-     * identificador.
+     * Lectura de un registro de la tabla Entrenamiento, buscado por su identificador.
      *
-     * @param idEntrenamiento Identificador del registro de la tabla de
-     * entrenamiento.
-     * @return Devuelve un objeto de tipo entrenamiento, con los datos del
-     * registro.
-     * @throws excepcionProyecto Devuelve cualquier error.
+     * @param idEntrenamiento Identificador del registro de la tabla de Entrenamiento.
+     * @return Devuelve un objeto de tipo Entrenamiento, con los datos del registro.
+     * @throws ExcepcionProyecto Devuelve cualquier error.
      */
-    public entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws excepcionProyecto
+    public Entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws ExcepcionProyecto
     {
         conectar();
-        String dql = "SELECT * FROM entrenamiento WHERE id_entrenamiento = " + idEntrenamiento;
+        String dql = "SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador"
+                + ", e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, "
+                + "d.apellido1 AS apellido1Deportista, d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, "
+                + "d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista "
+                + "FROM entrenamiento a, usuario e, usuario d "
+                + "WHERE e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario AND a.id_entrenamiento = " + idEntrenamiento;
 
-        /*
-        *   Posible solucion
-        *   SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador
-            , e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, d.apellido1 AS apellido1Deportista, 
-            d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista
-            FROM entrenamiento a, usuario e, usuario d 
-            WHERE id_entrenamiento = 1 AND e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario;
-         */
-        entrenamiento entrenamiento = new entrenamiento();
+        Entrenamiento entrenamiento = new Entrenamiento();
         try
         {
             Statement sentencia = conexion.createStatement();
@@ -559,11 +581,33 @@ public class ProyectoIgnacioCAD
             {
                 entrenamiento.setFecha(resultado.getDate("fecha"));
                 entrenamiento.setIdEntrenamiento(resultado.getInt("id_entrenamiento"));
-                //Tengo que recibir un usuario, preguntar.
-//                entrenamiento.setIdUsuarioDeportista(idUsuarioDeportista);
-//                entrenamiento.setIdUsuarioEntrenador(resultado.getInt("id_usuario"));
                 entrenamiento.setNombre(resultado.getString("nombre"));
                 entrenamiento.setPlazas(resultado.getInt("plazas"));
+
+                Usuario entrenador = new Usuario();
+                Usuario deportista = new Usuario();
+
+                entrenador.setApellido1(resultado.getString("apellido1Entrenador"));
+                entrenador.setApellido2(resultado.getString("apellido2Entrenador"));
+                entrenador.setCorreo(resultado.getString("correoEntrenador"));
+                entrenador.setIdUsuario(resultado.getInt("id_usuarioEntrenador"));
+                entrenador.setNombre(resultado.getString("nombreEntrenador"));
+                entrenador.setNombreUsuario(resultado.getString("nombreUsuarioEntrenador"));
+                entrenador.setTelefono(resultado.getString("telefonoEntrenador"));
+                entrenador.setTelefonoEmergencia(resultado.getString("telefonoEmergenciaEntrenador"));
+
+                entrenamiento.setIdUsuarioEntrenador(entrenador);
+
+                deportista.setApellido1(resultado.getString("apellido1Deportista"));
+                deportista.setApellido2(resultado.getString("apellido2Deportista"));
+                deportista.setCorreo(resultado.getString("correoDeportista"));
+                deportista.setIdUsuario(resultado.getInt("id_usuarioDeportista"));
+                deportista.setNombre(resultado.getString("nombreDeportista"));
+                deportista.setNombreUsuario(resultado.getString("nombreUsuarioDeportista"));
+                deportista.setTelefono(resultado.getString("telefonoDeportista"));
+                deportista.setTelefonoEmergencia(resultado.getString("telefonoEmergenciaDeportista"));
+
+                entrenamiento.setIdUsuarioDeportista(deportista);
             }
             //----- Cerrar la Conexión a la BD
             sentencia.close();
@@ -571,8 +615,10 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setSentenciaSQL(dql);
+            e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
             throw e;
@@ -581,17 +627,22 @@ public class ProyectoIgnacioCAD
     }
 
     /**
-     * Lectura de todos los datos de la tabla entrenamiento.
+     * Lectura de todos los datos de la tabla Entrenamiento.
      *
-     * @return Devuelve un arrayList con objetos de tipo entrenamiento, con los
-     * datos de cada registro.
-     * @throws excepcionProyecto Devuelve cualquier error.
+     * @return Devuelve un arrayList con objetos de tipo Entrenamiento, con los datos de cada registro.
+     * @throws ExcepcionProyecto Devuelve cualquier error.
      */
-    public ArrayList<entrenamiento> leerEntrenamientos() throws excepcionProyecto
+    public ArrayList<Entrenamiento> leerEntrenamientos() throws ExcepcionProyecto
     {
         conectar();
-        String dql = "SELECT * FROM entrenamiento e, usuario u, usuario u2 WHERE e.id_usuario_deportista = u.id_usuario AND e.id_usuario_entrenador = u2.id_usuario";
-        ArrayList<entrenamiento> entrenamientos = new ArrayList<>();
+        String dql = "SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador"
+                + ", e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, "
+                + "d.apellido1 AS apellido1Deportista, d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, "
+                + "d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista "
+                + "FROM entrenamiento a, usuario e, usuario d "
+                + "WHERE e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario";
+
+        ArrayList<Entrenamiento> entrenamientos = new ArrayList<>();
         try
         {
             Statement sentencia = conexion.createStatement();
@@ -601,17 +652,37 @@ public class ProyectoIgnacioCAD
 
             while (resultado.next())
             {
-                entrenamiento entre = new entrenamiento();
+                Entrenamiento entre = new Entrenamiento();
                 entre.setFecha(resultado.getDate("fecha"));
                 entre.setIdEntrenamiento(resultado.getInt("id_entrenamiento"));
-                //Tengo que recibir un usuario, preguntar.
-//                entrenamiento.setIdUsuarioDeportista(idUsuarioDeportista);
-//                entrenamiento.setIdUsuarioEntrenador(resultado.getInt("id_usuario"));
                 entre.setNombre(resultado.getString("nombre"));
                 entre.setPlazas(resultado.getInt("plazas"));
 
-//                usuario entrenador = new usuario(resultado.getInt("id_usuario"), dql, dql, dql, dql, dql, dql, dql);
-//                usuario deportista = new usuario(Integer.MIN_VALUE, dql, dql, dql, dql, dql, dql, dql);
+                Usuario entrenador = new Usuario();
+                Usuario deportista = new Usuario();
+
+                entrenador.setApellido1(resultado.getString("apellido1Entrenador"));
+                entrenador.setApellido2(resultado.getString("apellido2Entrenador"));
+                entrenador.setCorreo(resultado.getString("correoEntrenador"));
+                entrenador.setIdUsuario(resultado.getInt("id_usuarioEntrenador"));
+                entrenador.setNombre(resultado.getString("nombreEntrenador"));
+                entrenador.setNombreUsuario(resultado.getString("nombreUsuarioEntrenador"));
+                entrenador.setTelefono(resultado.getString("telefonoEntrenador"));
+                entrenador.setTelefonoEmergencia(resultado.getString("telefonoEmergenciaEntrenador"));
+
+                entre.setIdUsuarioEntrenador(entrenador);
+
+                deportista.setApellido1(resultado.getString("apellido1Deportista"));
+                deportista.setApellido2(resultado.getString("apellido2Deportista"));
+                deportista.setCorreo(resultado.getString("correoDeportista"));
+                deportista.setIdUsuario(resultado.getInt("id_usuarioDeportista"));
+                deportista.setNombre(resultado.getString("nombreDeportista"));
+                deportista.setNombreUsuario(resultado.getString("nombreUsuarioDeportista"));
+                deportista.setTelefono(resultado.getString("telefonoDeportista"));
+                deportista.setTelefonoEmergencia(resultado.getString("telefonoEmergenciaDeportista"));
+
+                entre.setIdUsuarioDeportista(deportista);
+
                 entrenamientos.add(entre);
             }
 
@@ -621,14 +692,14 @@ public class ProyectoIgnacioCAD
 
         } catch (SQLException ex)
         {
-            excepcionProyecto e = new excepcionProyecto();
+            ExcepcionProyecto e = new ExcepcionProyecto();
             e.setMensajeErrorAdministrador(ex.getMessage());
+            e.setSentenciaSQL(dql);
+            e.setCodigoError(ex.getErrorCode());
             e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
 
             throw e;
         }
         return entrenamientos;
     }
-    
-    
 }

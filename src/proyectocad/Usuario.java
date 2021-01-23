@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package proyectoignaciocad;
+package proyectocad;
 
 /**
  *
  * @author Alejandro Campos Maestre
  */
-public class usuario
+public class Usuario
 {
 
     Integer idUsuario;
@@ -18,7 +18,7 @@ public class usuario
     /**
      * Constructor vacio de la clase
      */
-    public usuario()
+    public Usuario()
     {
     }
 
@@ -26,7 +26,7 @@ public class usuario
      * Constructor con solo el identificador del objeto usuario
      * @param idUsuario identificador del objeto usuario
      */
-    public usuario(Integer idUsuario)
+    public Usuario(Integer idUsuario)
     {
         this.idUsuario = idUsuario;
     }
@@ -42,7 +42,7 @@ public class usuario
      * @param telefonoEmergencia telefono de emergencia del usuario de la tabla usuario
      * @param nombreUsuario NickName del usuario de la tabla usuario
      */
-    public usuario(Integer idUsuario, String correo, String nombre, String apellido1, String apellido2, String telefono, String telefonoEmergencia, String nombreUsuario)
+    public Usuario(Integer idUsuario, String correo, String nombre, String apellido1, String apellido2, String telefono, String telefonoEmergencia, String nombreUsuario)
     {
         this.idUsuario = idUsuario;
         this.correo = correo;
@@ -65,7 +65,7 @@ public class usuario
 
     /**
      * Asignacion del atributo idUsuario
-     * @param idUsuario Tipo Integer con el identificador del registro de usuario
+     * @param idUsuario Tipo Integer con el identificador del registro de Usuario
      */
     public void setIdUsuario(Integer idUsuario)
     {
@@ -83,7 +83,7 @@ public class usuario
 
     /**
      * Asignacion del atributo correo
-     * @param correo Tipo String con el correo del usuario
+     * @param correo Tipo String con el correo del Usuario
      */
     public void setCorreo(String correo)
     {
@@ -101,7 +101,7 @@ public class usuario
 
     /**
      * Asignacion del atributo nombre
-     * @param nombre Tipo String con el nombre del usuario
+     * @param nombre Tipo String con el nombre del Usuario
      */
     public void setNombre(String nombre)
     {
@@ -119,7 +119,7 @@ public class usuario
 
     /**
      * Asignacion del atributo apellido1
-     * @param apellido1 Tipo String con el apellido1 del usuario
+     * @param apellido1 Tipo String con el apellido1 del Usuario
      */
     public void setApellido1(String apellido1)
     {
@@ -137,7 +137,7 @@ public class usuario
 
     /**
      * Asignacion del atributo apellido2
-     * @param apellido2 Tipo String con el apellido2 del usuario
+     * @param apellido2 Tipo String con el apellido2 del Usuario
      */
     public void setApellido2(String apellido2)
     {
@@ -155,7 +155,7 @@ public class usuario
 
     /**
      * Asignacion del atributo telefono
-     * @param telefono Tipo String con el telefono del usuario
+     * @param telefono Tipo String con el telefono del Usuario
      */
     public void setTelefono(String telefono)
     {
@@ -173,7 +173,7 @@ public class usuario
 
     /**
      * Asignacion del atributo telefonoEmergencia
-     * @param telefonoEmergencia Tipo String con el telefonoEmergencia del usuario
+     * @param telefonoEmergencia Tipo String con el telefonoEmergencia del Usuario
      */
     public void setTelefonoEmergencia(String telefonoEmergencia)
     {
@@ -191,7 +191,7 @@ public class usuario
 
     /**
      * Asignacion del atributo nombreUsuario
-     * @param nombreUsuario Tipo String con el nombreUsuario del usuario
+     * @param nombreUsuario Tipo String con el nombreUsuario del Usuario
      */
     public void setNombreUsuario(String nombreUsuario)
     {

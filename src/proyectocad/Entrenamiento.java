@@ -3,25 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package proyectoignaciocad;
+package proyectocad;
 
-import java.util.Date;
+import java.sql.Date;
+
 
 /**
  *
  * @author Alejandro Campos Maestre
  */
-public class entrenamiento
+public class Entrenamiento
 {
     Integer idEntrenamiento, plazas;
     String nombre;
     Date fecha;
-    usuario idUsuarioEntrenador, idUsuarioDeportista;
+    Usuario idUsuarioEntrenador, idUsuarioDeportista;
 
     /**
      * Constructor vacio de la clase
      */
-    public entrenamiento()
+    public Entrenamiento()
     {
     }
 
@@ -31,10 +32,10 @@ public class entrenamiento
      * @param plazas Numero de plazas del registro entrenamiento
      * @param nombre Nombre del entrenamiento del registro
      * @param fecha fecha del entrenamiento del registro
-     * @param idUsuarioEntrenador Objeto usuario entrenador
-     * @param idUsuarioDeportista Objeto usuario deportista
+     * @param idUsuarioEntrenador Objeto Usuario entrenador
+     * @param idUsuarioDeportista Objeto Usuario deportista
      */
-    public entrenamiento(Integer idEntrenamiento, Integer plazas, String nombre, Date fecha, usuario idUsuarioEntrenador, usuario idUsuarioDeportista)
+    public Entrenamiento(Integer idEntrenamiento, Integer plazas, String nombre, Date fecha, Usuario idUsuarioEntrenador, Usuario idUsuarioDeportista)
     {
         this.idEntrenamiento = idEntrenamiento;
         this.plazas = plazas;
@@ -55,7 +56,7 @@ public class entrenamiento
 
     /**
      * Asignacion del atributo idEntrenamiento
-     * @param idEntrenamiento Tipo Integer con el identificador del entrenamiento
+     * @param idEntrenamiento Tipo Integer con el identificador del Entrenamiento
      */
     public void setIdEntrenamiento(Integer idEntrenamiento)
     {
@@ -117,37 +118,37 @@ public class entrenamiento
     }
 
     /**
-     * Obtencion del objeto usuario con la informacion del entrenador
-     * @return Tipo usuario con la informacion del usuario entrenador
+     * Obtencion del objeto Usuario con la informacion del entrenador
+     * @return Tipo Usuario con la informacion del Usuario entrenador
      */
-    public usuario getIdUsuarioEntrenador()
+    public Usuario getIdUsuarioEntrenador()
     {
         return idUsuarioEntrenador;
     }
 
     /**
-     * Asignacion del objeto usuario que sera el entrenador
-     * @param idUsuarioEntrenador Tipo usuario con el objeto usuario que sera el entrenador
+     * Asignacion del objeto Usuario que sera el entrenador
+     * @param idUsuarioEntrenador Tipo Usuario con el objeto Usuario que sera el entrenador
      */
-    public void setIdUsuarioEntrenador(usuario idUsuarioEntrenador)
+    public void setIdUsuarioEntrenador(Usuario idUsuarioEntrenador)
     {
         this.idUsuarioEntrenador = idUsuarioEntrenador;
     }
 
     /**
-     * Obtencion del objeto usuario con la informacion del deportista
-     * @return Tipo usuario con la informacion del usuario deportista
+     * Obtencion del objeto Usuario con la informacion del deportista
+     * @return Tipo Usuario con la informacion del Usuario deportista
      */
-    public usuario getIdUsuarioDeportista()
+    public Usuario getIdUsuarioDeportista()
     {
         return idUsuarioDeportista;
     }
 
     /**
-     * Asignacion del objeto usuario que sera el deportista
-     * @param idUsuarioDeportista Tipo usuario con el objeto usuario que sera el deportista
+     * Asignacion del objeto Usuario que sera el deportista
+     * @param idUsuarioDeportista Tipo Usuario con el objeto Usuario que sera el deportista
      */
-    public void setIdUsuarioDeportista(usuario idUsuarioDeportista)
+    public void setIdUsuarioDeportista(Usuario idUsuarioDeportista)
     {
         this.idUsuarioDeportista = idUsuarioDeportista;
     }
