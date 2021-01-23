@@ -524,7 +524,7 @@ public class ProyectoCAD
             e.setSentenciaSQL(llamada);
 
             switch (ex.getErrorCode())
-            { //FIXME revisar
+            { //FIXME revisar trigger de la tabla entrenamiento, salta tabla mutante
                 case 2291:
                     e.setMensajeErrorUsuario("El entrenador o el deportista no existe.");
                     break;
@@ -563,12 +563,12 @@ public class ProyectoCAD
     {
         conectar();
         String dql = "SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador"
-                + ", e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, "
-                + "d.apellido1 AS apellido1Deportista, d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, "
-                + "d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista "
+                + ", e.nombreUsuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoEmergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, "
+                + "d.apellido1 AS apellido1Deportista, d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreUsuario AS nombreUsuarioDeportista, "
+                + "d.telefono AS telefonoDeportista, d.telefonoEmergencia AS telefonoEmergenciaDeportista "
                 + "FROM entrenamiento a, usuario e, usuario d "
-                + "WHERE e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario AND a.id_entrenamiento = " + idEntrenamiento;
-
+                + "WHERE e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario AND a.ID_ENTRENAMIENTO = " + idEntrenamiento;
+        
         Entrenamiento entrenamiento = new Entrenamiento();
         try
         {
@@ -576,7 +576,6 @@ public class ProyectoCAD
 
             //----- Lanzamiento de una sentencia DQL
             ResultSet resultado = sentencia.executeQuery(dql);
-
             if (resultado.next())
             {
                 entrenamiento.setFecha(resultado.getDate("fecha"));
@@ -599,15 +598,18 @@ public class ProyectoCAD
                 entrenamiento.setIdUsuarioEntrenador(entrenador);
 
                 deportista.setApellido1(resultado.getString("apellido1Deportista"));
+                
                 deportista.setApellido2(resultado.getString("apellido2Deportista"));
+                
                 deportista.setCorreo(resultado.getString("correoDeportista"));
                 deportista.setIdUsuario(resultado.getInt("id_usuarioDeportista"));
                 deportista.setNombre(resultado.getString("nombreDeportista"));
                 deportista.setNombreUsuario(resultado.getString("nombreUsuarioDeportista"));
                 deportista.setTelefono(resultado.getString("telefonoDeportista"));
                 deportista.setTelefonoEmergencia(resultado.getString("telefonoEmergenciaDeportista"));
-
+                
                 entrenamiento.setIdUsuarioDeportista(deportista);
+                
             }
             //----- Cerrar la Conexión a la BD
             sentencia.close();
@@ -638,7 +640,7 @@ public class ProyectoCAD
         String dql = "SELECT a.*, e.nombre AS nombreEntrenador, e.apellido1 AS apellido1Entrenador, e.apellido2 AS apellido2Entrenador, e.correo AS correoEntrenador, e.id_usuario AS id_usuarioEntrenador"
                 + ", e.nombreusuario AS nombreUsuarioEntrenador, e.telefono AS telefonoEntrenador, e.telefonoemergencia AS telefonoEmergenciaEntrenador, d.nombre AS nombreDeportista, "
                 + "d.apellido1 AS apellido1Deportista, d.apellido2 AS apellido2Deportista, d.correo AS correoDeportista, d.id_usuario AS id_usuarioDeportista, d.nombreusuario AS nombreUsuarioDeportista, "
-                + "d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoDeportista "
+                + "d.telefono AS telefonoDeportista, d.telefonoemergencia AS telefonoEmergenciaDeportista "
                 + "FROM entrenamiento a, usuario e, usuario d "
                 + "WHERE e.id_usuario = a.id_usuario_entrenador AND a.id_usuario_deportista = d.id_usuario";
 
