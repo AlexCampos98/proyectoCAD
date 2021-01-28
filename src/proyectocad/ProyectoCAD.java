@@ -23,7 +23,7 @@ public class ProyectoCAD
 {
 
     Connection conexion;
-    String IP, nombreBD, contraseñaBD;
+    static String IP = null, nombreBD = null, contraseñaBD = null;
 
     /**
      * Constructor con la carga del Driver en Memoria
@@ -35,7 +35,6 @@ public class ProyectoCAD
         try
         {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            IP = null;
         } catch (ClassNotFoundException ex)
         {
             ExcepcionProyecto e = new ExcepcionProyecto();
@@ -56,9 +55,9 @@ public class ProyectoCAD
     {
         try
         {
-            this.IP = IP;
-            this.nombreBD = nombreBD;
-            this.contraseñaBD = contraseñaBD;
+            ProyectoCAD.IP = IP;
+            ProyectoCAD.nombreBD = nombreBD;
+            ProyectoCAD.contraseñaBD = contraseñaBD;
             
             Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException ex)
