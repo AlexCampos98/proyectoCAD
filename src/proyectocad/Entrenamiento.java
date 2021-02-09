@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package proyectocad;
 
 import java.sql.Date;
 
 
 /**
- *
+ * Clase Pojo con los datos de un entrenamiento.
  * @author Alejandro Campos Maestre
  */
 public class Entrenamiento

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package proyectocad;
 
 import java.sql.CallableStatement;
@@ -16,7 +11,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 
 /**
- *
+ * Clase creada para el manejo de la conexion de una BD Oracle con Java para el proyecto.
  * @author Alejandro Campos Maestre
  */
 public class ProyectoCAD
@@ -26,9 +21,9 @@ public class ProyectoCAD
     static String IP = null, nombreBD = null, contraseñaBD = null;
 
     /**
-     * Constructor con la carga del Driver en Memoria
+     * Constructor por defecto, con la carga del Driver en Memoria
      *
-     * @throws proyectocad.ExcepcionProyecto Devuelve el error al intentar cargar el Driver
+     * @throws proyectocad.ExcepcionProyecto Devuelve un error al intentar cargar el Driver
      */
     public ProyectoCAD() throws ExcepcionProyecto
     {
@@ -49,7 +44,7 @@ public class ProyectoCAD
      * @param IP Direccion de la interfaz en red del servidor BD
      * @param nombreBD Nombre de la BD
      * @param contraseñaBD Contraseña de la BD
-     * @throws proyectocad.ExcepcionProyecto Devuelve el error al intentar cargar el Driver
+     * @throws proyectocad.ExcepcionProyecto Devuelve un error al intentar cargar el Driver
      */
     public ProyectoCAD(String IP, String nombreBD, String contraseñaBD) throws ExcepcionProyecto
     {
@@ -70,9 +65,9 @@ public class ProyectoCAD
     }
 
     /**
-     * Metodo usado para conectar con la BD
-     *
-     * @throws ExcepcionProyecto Cuando se produzca cualquier error
+     * Metodo usado para conectar con la BD, este metodo diferencia entre una 
+     * conexcion por defecto o una conexion con parametros de IP, nombreBD y contraseñaBD.
+     * @throws ExcepcionProyecto Cuando se produzca cualquier error en la conexion.
      */
     private void conectar() throws ExcepcionProyecto
     {
@@ -80,7 +75,6 @@ public class ProyectoCAD
         {
             if (IP == null)
             {
-                //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.209.69:1521:test", "proyecto", "kk");
                 conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.1.125:1521:test", "proyecto", "kk");
             } else
             {
@@ -100,7 +94,7 @@ public class ProyectoCAD
     /**
      * Inserta un registro de Usuario a la base de datos, tabla Usuario.
      *
-     * @param usuario Clase solicitada con los datos necesarios del Usuario para inserta en la BD.
+     * @param usuario Clase solicitada con los datos necesarios del Usuario para inserta en la BD, no es necesario el idUsuario.
      * @return Cantidad de registros añadidos
      * @throws ExcepcionProyecto Cuando se produzca cualquier error con la conexion o con excepciones SQL.
      */
@@ -121,7 +115,7 @@ public class ProyectoCAD
             sentenciaPreparada.setString(6, usuario.getTelefonoEmergencia());
             sentenciaPreparada.setString(7, usuario.getNombreUsuario());
 
-            //----- Lanzamiento de una sentencia DQL
+            //----- Lanzamiento de una sentencia DML
             resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
@@ -145,7 +139,7 @@ public class ProyectoCAD
                     e.setMensajeErrorUsuario("No puedes dejar ningun dato sin rellenar.");
                     break;
 
-                case 2290: //FIXME Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
+                case 2290:
                     e.setMensajeErrorUsuario("El correo debe seguir los parametros normalizados (____@___.__) y el numero de telefono no puede ser el mismo numero que el de emergencia.");
                     break;
 
@@ -165,14 +159,13 @@ public class ProyectoCAD
     }
 
     /**
-     * Elimina el registro de la tabla Usuario. Necesita el identificador del
-     * registro.
+     * Elimina un registro de la tabla Usuario. Necesita el identificador del
+     * usuario.
      *
-     * @param idUsuario indica el valor del campo Usuario.id_usuario del
-     * registro a eliminar
+     * @param idUsuario Identificador del usuario a elminiar.
      * @return Cantidad de registros eliminados
      * @throws ExcepcionProyecto Cuando se produzca cualquier excepcion en la
-     * conexion a la BD
+     * conexion a la BD o una Foreign Key.
      */
     public int eliminarUsuario(Integer idUsuario) throws ExcepcionProyecto
     {
@@ -184,7 +177,7 @@ public class ProyectoCAD
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, idUsuario, Types.INTEGER);
 
-            //----- Lanzamiento de una sentencia DQL
+            //----- Lanzamiento de una sentencia DML
             resultado = sentenciaPreparada.executeUpdate();
 
             //----- Cerrar la Conexión a la BD
@@ -217,7 +210,7 @@ public class ProyectoCAD
      * identificador.
      *
      * @param usuario Objeto de tipo Usuario con los datos para proceder a la
-     * modficacion
+     * modficacion, necesaria la idUsuario para modificar.
      * @throws ExcepcionProyecto Cuando se produzca cualquier error en la
      * conexio o sentencia SQL.
      */
@@ -263,7 +256,7 @@ public class ProyectoCAD
                     e.setMensajeErrorUsuario("Es obligatorio rellenar todos los datos.");
                     break;
 
-                case 2290: //FIXME Preguntar, la check como dividirlas, aunque habria que solucionarlas antes de llegar aqui.
+                case 2290:
                     e.setMensajeErrorUsuario("El correo debe seguir los parametros normalizados (____@___.__) y el numero de telefono no puede ser el mismo numero que el de emergencia.");
                     break;
 
@@ -283,10 +276,11 @@ public class ProyectoCAD
     /**
      * Lectura de los datos de la tabla Usuario, buscando por la id del Usuario.
      *
-     * @param idUsuario Numero de busqueda por ID. Tipo INTEGER.
-     * @return Devuelve un objeto de tipo Usuario con los datos del usaurio
-     * selecionado.
-     * @throws ExcepcionProyecto Devuelve cualquier error.
+     * @param idUsuario Identificador del usuario de la tabla usuario.
+     * @return Devuelve un objeto de tipo Usuario con los datos del usuario
+     * selecionado, si no existe, se devuelve un objeto vacio.
+     * @throws ExcepcionProyecto Devuelve un error en caso de cualquier problema
+     * con la conexion de la BD.
      */
     public Usuario leerUsuario(Integer idUsuario) throws ExcepcionProyecto
     {
@@ -331,7 +325,7 @@ public class ProyectoCAD
      * Lectura de todos los registros de la tabla Usuario.
      *
      * @return Devuelve un arrayList con objetos Usuario con todos los registros de la tabla Usuario.
-     * @throws ExcepcionProyecto Devuelve cualquier tipo de error.
+     * @throws ExcepcionProyecto Devuelve cualquier tipo de error de conexion.
      */
     public ArrayList<Usuario> leerUsuarios() throws ExcepcionProyecto
     {
@@ -381,8 +375,10 @@ public class ProyectoCAD
      * Inserta un registro en la tabla de Entrenamiento
      *
      * @param entrenamiento Objeto Entrenamiento con los datos necesarios para la insercion de los mismos en la BD.
+     * El identificador no se usa.
      * @return El numero de registros afectados.
-     * @throws ExcepcionProyecto Devuelve cualquier tipo de error.
+     * @throws ExcepcionProyecto Devuelve cualquier tipo de error en la conexion a la BD o 
+     * cualquier tipo de excepcion en la BD.
      */
     public int insertarEntrenamiento(Entrenamiento entrenamiento) throws ExcepcionProyecto
     {
@@ -448,11 +444,11 @@ public class ProyectoCAD
     }
 
     /**
-     * Eliminacion de un registro de la tabla Usuario, por el identificador del Entrenamiento
+     * Eliminacion de un registro de la tabla Entrenamiento, por el identificador del Entrenamiento
      *
-     * @param idEntrenamiento Numero de identificador de la tabla Entrenamiento.
+     * @param idEntrenamiento Identificador del registro a elminiar de la tabla Entrenamiento.
      * @return Devuelve el numero de registros afectados.
-     * @throws ExcepcionProyecto Devuelve cualquier error.
+     * @throws ExcepcionProyecto Devuelve cualquier error en la conexion de la BD.
      */
     public int eliminarEntrenamiento(Integer idEntrenamiento) throws ExcepcionProyecto
     {
@@ -487,10 +483,10 @@ public class ProyectoCAD
      * Modificacion de un registro de la tabla Entrenamiento
      *
      * @param entrenamiento Objeto Entrenamiento con los datos necesarios para la modificacion del registro.
-     * @return 0. No devuelve el numero de registros modificados.
+     * Y con el identificador del registro a modificar. idEntrenamiento
      * @throws ExcepcionProyecto Devuelve cualquer errror producido.
      */
-    public int modificarEntrenamiento(Entrenamiento entrenamiento) throws ExcepcionProyecto
+    public void modificarEntrenamiento(Entrenamiento entrenamiento) throws ExcepcionProyecto
     {
         conectar();
         String llamada = "call modificar_entrenamiento(?,?,?,?,?,?)";
@@ -545,8 +541,6 @@ public class ProyectoCAD
 
             throw e;
         }
-
-        return 0;
     }
 
     /**
@@ -554,7 +548,7 @@ public class ProyectoCAD
      *
      * @param idEntrenamiento Identificador del registro de la tabla de Entrenamiento.
      * @return Devuelve un objeto de tipo Entrenamiento, con los datos del registro.
-     * @throws ExcepcionProyecto Devuelve cualquier error.
+     * @throws ExcepcionProyecto Devuelve cualquier error en la conexion BD.
      */
     public Entrenamiento leerEntrenamiento(Integer idEntrenamiento) throws ExcepcionProyecto
     {
@@ -629,7 +623,7 @@ public class ProyectoCAD
      * Lectura de todos los datos de la tabla Entrenamiento.
      *
      * @return Devuelve un arrayList con objetos de tipo Entrenamiento, con los datos de cada registro.
-     * @throws ExcepcionProyecto Devuelve cualquier error.
+     * @throws ExcepcionProyecto Devuelve cualquier error de conexion BD.
      */
     public ArrayList<Entrenamiento> leerEntrenamientos() throws ExcepcionProyecto
     {

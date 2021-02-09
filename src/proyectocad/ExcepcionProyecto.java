@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package proyectocad;
 
 /**
- *
+ * Clase con los datos necesarios para manejar una excepcion de tipo SQL.
  * @author Alejandro Campos Maestre
  */
 public class ExcepcionProyecto extends Exception
@@ -117,6 +112,4 @@ public class ExcepcionProyecto extends Exception
     {
         return "excepcionUsuario{" + "mensajeErrorUsuario=" + mensajeErrorUsuario + ", mensajeErrorAdministrador=" + mensajeErrorAdministrador + ", sentenciaSQL=" + sentenciaSQL + ", codigoError=" + codigoError + '}';
     }
-    
-    
 }
